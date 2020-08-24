@@ -1,0 +1,32 @@
+_Subject_: RE: Ramp up - BNPP A Fund Global Fixed Rate Portfolio 2024
+
+All,
+
+We are done with the ramp-up.
+
+The weighted average YTW of the portfolio was 4.52%. The investment team’s suggestion is that we will aim to distribute 4.15% (minus fees). As always, we are open to everyone’s inputs.
+
+Our assumptions below.
+
+_Reinvestment cost: 1.25% -> FRA Libor + ASW of 70 to 80bps. Conservative because:_
+-	It assumes ASW in line with super-IGs, when in reality, the majority of maturity mismatched or callable bonds are HY
+-	At such low yield levels, it would expect outflows since the yield would barely cover TER. Cash flows are not modelled.
+-	Volatility is on our side. Sell-offs are usually an opportunity to extend HY. Rallies may provide an opportunity to shift short-dated HY into better rated, liquid, long-dated bonds with less impact to all-in yield
+-	During the year of 2021, the primary market for 3Y bonds will allow us to extend some of the duration and eliminate portion the yield at risk.
+
+_Cash drag between distributions is negligible:_
+-	Given the number of different hedge classes, there will be noise in the cash levels. From experience, those dwarf the cash levels from coupons received.
+
+_Expedited execution of HY part added 5bps:_
+-	From accrual during the ramp-up period
+
+_We have used YTW, but haven’t adjusted the cash drag to the work-out date of the callable bonds:_
+-	40% of the portfolio is callable, but 4/5 of those have calls that are considered by us to be unlikely, not meaningful, replaceable or desirable.
+-	Bloomberg’s methodology ignores the US treasury slope. That said, it is not appropriate to assume the YTW work-out date to be the most probable.
+-	We are at bottom convexity for most of those bonds and in case of an immediate call, not only all of them would be replaceable, but also the exercise would be hugely profitable for us. Convexity goes us very sharply from now to the time exit fees cease to exist.
+
+_Additionally, our trades have been working exchange orders that could easily add 5bps to our estimate over the course of the next month._
+
+Calculations and trades attached.
+
+Alex
