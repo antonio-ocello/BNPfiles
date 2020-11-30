@@ -1,0 +1,832 @@
+\documentclass[a4paper]{article}
+
+\usepackage{bbold}
+\usepackage{xcolor}
+\usepackage{url}%for the urls
+\usepackage{hyperref}%links
+
+\usepackage[UKenglish]{babel}
+%\usepackage[utf8x]{inputenc}
+\usepackage[utf8]{inputenc}%this one includes accents
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{graphicx}
+\usepackage[colorinlistoftodos]{todonotes}
+\setlength\parindent{0pt}
+\usepackage{geometry}
+\geometry{margin=1.5in}
+\usepackage{float}
+
+\newtheorem{proposition}{Proposition}[section]
+\newtheorem{theorem}{Theorem}[section]
+
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+
+\usepackage{authblk}%for institution of the authors
+\renewcommand\Affilfont{\itshape\small}%to change the font of the institution
+
+\title{Off-cycle internship report}
+%\author{Andrea Caberletti and Antonio Ocello}
+\author{Antonio Ocello\\[1ex] 
+\small Supervisor: Jean Czyhir\\
+Examinator: Nizar Touzi}  % use a smaller font size
+\affil{Master 2: Probabilités et Finance\\ Sorbonne Université and \'Ecole Polytechnique}
+
+\providecommand{\keywords}[1]{\textit{Keywords: #1}}%keywords
+%MODIFICHE DI ALEX
+\date{November 30, 2020}
+\usepackage{titling}
+\renewcommand\maketitlehooka{\null\mbox{}\vfill}
+\renewcommand\maketitlehookd{\vfill\null}
+%%%%%%
+
+\begin{document}
+\begin{titlingpage}
+\maketitle
+\begin{figure}
+    \centering
+    \includegraphics[width=8cm]{logo.jpg}
+\end{figure}
+\end{titlingpage}
+% \begin{abstract}
+% TO ADD
+% \end{abstract}
+
+% \vspace{0.2cm}
+% \keywords{TO ADD}
+
+\tableofcontents
+
+\newpage
+\section*{Introduction}
+\textit{BNP Paribas Asset Management} is a French asset management company, it is part of the BNP Paribas Group. It has more than 500 billion in assets under management, giving it 4th place in the French market in terms of assets under management. \\
+
+Historically, \textit{BNP Paribas Asset Management }is the result of the merger of various companies, in particular the merger of \textit{BNP Paribas Investment Partners} and \textit{Fortis Investment Management}. The products offered by \textit{BNP Paribas Asset Management} are very varied in terms of class of assets and themes, products can be found, among others, in the following markets: equities, exchange rates, bonds, emerging markets, multi-asset products. \\
+
+Within the proposed strategies, a special role is played by \textit{Fixed Income}, a team within which I did my internship. In this field, the fixed income strategies are run seeking to outperform the markets through top-down asset, sector and regional allocation, and bottom-up issuer and issue selection, as well as the choice of the best fixed income instruments to invest in. \\
+
+Investments are subject to market fluctuations and the risks inherent in investments in securities. The value of investments and the income they generate may go down as well as up and it is possible that investors will not recover their initial outlay, the strategies described being in risk of capital loss. There is no guarantee that the performance objective will be achieved. Past performance or achievement is not indicative of current or future performance.\\
+\hfill
+\hfill
+
+\quad During the first part of my internship (two out of six months), I mainly worked on modelling a buy and hold portfolio. This first work within the quantitative research group was to capture all the possible degrees of difficulty involved in calculating a yield of such a portfolio. In particular, special attention was dedicated in the description of the \textit{reinvestment} that a portfolio manager must perform in the time between the maturity of the bond and the payment to the client and the impact due to possible \textit{defaults}. This second part is perfectly up-to-date with the new challenges that the financial world has to face at the moment due to the \textit{Covid-19} crisis. \\
+
+\quad In the second part of my period at \textit{BNP Paribas Asset Management}, my focus was put into the construction of an issuer classification strategy through the analysis of credit factors. A model this way constructed had the intention of explaining the cross-section of corporate bond expected returns for the U.S. and Euro Investment Grade and U.S. High Yield universes.\\
+
+I started such an analysis with the construction of such descriptive factors of the quality of the company. Such an operation led us to the study of the bias that such data could present, thus trying to find the most effective strategy for their neutralisation. Following this stage of data cleansing, we conducted a data breakdown based on economic and correlation criteria in order to make an optimal selection of a group of factors to obtain a model. \\
+
+The last part of the internship was further strengthened by a direct comparison of our work with the portfolio managers. Trying to maintain an overall vision and a practical point of view, we went looking for new possible paths of improvement. I personally found this part to be extremely interesting: by dealing with the end users of this product, we have been able to adapt our model to the concrete needs to which it must respond, understanding its strengths much better and working on its weaknesses once established.
+
+\newpage
+
+\section{Buy-and-hold portfolio returns}
+The first part of the intenship consisted in the modelization of Buy and Hold portfolio and computation of its yield when the impact FX, the one of the reinvestment and the default are taken into account. Specially in a period like our own it is very important to be able to model these two different aspect in order to better understand what kind of return propose to a client. \\
+
+The idea behind a buy-and-hold investing strategy is to buy a bond or other investment and hold it for a long period of time. \\
+
+\subsection{Buy and Hold portfolio of one bond}
+
+We suppose initially that we have a portfolio made on one single bond. First we need to be given the dates of payment of the coupon and the notional to our client, which could differ to the ones of our bond. This means that there will be cash in the portfolio during some time periods that we must reinvest. \\
+
+On the first case we are considering that the cashflows are exactly the ones of our bond. In this scenario we have that the \textit{Internal rate of return} (\textit{IRR}) of our portfolio is exactly the one we have when considering the cashflows of this issue.\\
+
+\paragraph{IRR computation}
+The \textit{internal rate of return} (IRR) is a metric used to estimate the profitability of potential investments. The internal rate of return is a discount rate that makes the \textit{net present value} (NPV) of all cash flows equal to zero in a discounted cash flow analysis. The relationship between the \textit{NPV} an the \textit{IRR} is 
+\begin{equation*}
+    \text{NPV} =  \sum_t \frac{C_t}{(1+\text{IRR})^t}+c_0 = 0
+\end{equation*}
+where $C_t$ is the net cash inflow during the period $t$, $C_0$is the total initial investment costs and $t$ is the number of time periods. In this writing we have that the \textit{IRR} is the annual return that makes the net present value equal to zero.\\
+
+To calculate \textit{IRR} using this formula, one would set \textit{NPV} equal to zero and solve for the discount rate, which is the \textit{IRR}. Because of the nature of the formula, the \textit{IRR} cannot be calculated analytically, except for special cases, and therefore it instead be calculated through Newton's method of zero search.
+
+\subsubsection{Reinvestment hypothesis}
+In the case where the payment dates of the bond and the ones to the client are not aligned, a reinvestment in the exposed period is in order. In fact, when the coupon or notional of the bond pays at time $t_1$ and the next payment to the client is done at time $t_2 > t_1$, a cost of reinvestment must be considered. During the period $[t_1,t_2]$, the amount of money deposited not yet paid is reinvested to a cash rate (weaker than the portfolio's rate). This complexification of the modeling impacts the \textit{IRR} of the portfolio and it makes it decrease.\\
+
+In order to compute the correct investment rate to apply, the swap rate curve is studied with linear interpolation and arbitrage-free approaches are used to find the correct rate.\\
+
+When this cost is taken into account we talk about \textit{Gross Yield to Maturity} (YTM) of the portfolio, \textit{Super Gross YTM} when not.\\
+
+\subsubsection{Default impact}
+The second level of complexity consists in taking into account the impact of the default. The coupon and the notional, scheduled for some dates $t_i$, are touched with a probability of survival, which is a function of the time. This new step is necessary due to a regulatory obligation to safeguard the client. In fact, the \textit{Autorité des marchés financiers} (AMF) in portfolio validation wants the customer to be informed the product he is buying is not $100\%$ safe but that a default probability is at stake.\\
+
+For the modeling of such an impact, all the cash flows $C_j$ we have at a given $t$ date need to be updated in this way:
+$$
+C_j^{\text{new}} = C_j \ \mathbb{P}(\text{survival}) +  C_j\ R \ (1- \mathbb{P}(\text{survival}))
+$$
+where $R$ is the \textit{recovery rate} and it is a parameter of the model.\\
+
+When the default impact is considered in addition to the reinvestment one, we talk about \textit{Estimated Gross YTM}.\\
+
+\paragraph{Survival probability computation}
+
+The computation is based on the two transition matrices provided by \textit{Moody's}: the short term ($ST$), updated monthly, and the long term one ($LT$), updated yearly. This process is modeled through the \textit{absorbing Markov chain} of the rating change. An absorbing Markov chain is a Markov chain in which every state can reach an absorbing state, which in our case is considered to be the default. The probability of reaching this state we are the most interested in and to have it we must consider the correct transition matrix. \\
+
+In order to be able to integrate the temporal dimension within this calculation, the transition matrix considered at each instant is as a combination of $ST$ and $LT$. The rating of each company is chosen looking at the different ratings from \textit{S\&P's}, \textit{Moody's} and \textit{Fitch's}.\\
+
+\begin{figure}[h]
+\caption{\small Example of a short term rating transition matrix published by Moody's in July 2020. A shift towards down grades of survival probability can be seen.}
+\includegraphics[width=13.5cm]{moodys matrix.png}
+\centering
+\end{figure}
+The method considered (until the Coronavirus crisis) was a convergence from $ST$ matrix to $LT$ linearly over $7$ years. While we have $LT$ which does not vary much in its updates, at the end of March 2020 a disruption of the short term matrix has been registered: a huge downgrade, big shift towards default. This change has brought with it a great impact on default considerations, bringing all portfolio yields close to $0$, ceasing to be a realistic description of reality.\\
+
+Different approaches to change the combiners that give the probability of default over time have been looked for, but none of them was convincing.  Focusing on the \textit{spread} (the difference between the yield of a bond and that of a German Treasury bond) as a proxy of this distance between the stressed moment we are right now and a stable one (long-term), the $ST$ matrix has been in a first phase replaced by a
+$$
+\hat{ST} = \alpha \ ST +(1-\alpha)\ LT \ .
+$$
+
+The parameter $\alpha$ has been selected as the combiner that gives today's spread as a linear combination of the stressed spread recorded at the end of March 2020 and the long-term spread. However, this type of approach did not prove satisfactory, especially in the Credit market, where the spread almost coincided with the long term spread due to the work of central banks, injecting liquidity and buying corporate debt. This has led the $\hat{ST}$ matrix to almost coincide with $LT$ and therefore to lose a description of this period of stress.\\
+
+However, a study of past crises has shown that, although in the past the recovery of a normal trend could be long (e.g. the 2002 telecomunications crisis), this was shortened by the external intervention of the central banks. In 2008, in fact, injecting liquidity meant that, although the crisis was bigger than in 2002, the response from the market has been much faster.\\
+
+Thanks to this observation the method put then into practice was to consider in the first year the $ST$ matrix, highly stressed by the moment of crisis, and for the following years consider directly $LT$.\\
+
+\subsection{Buy and Hold portfolio with multiple bond}
+
+Given a portfolio with the weight of each bond, the calculation made is the same, weighting the cashflows received by this initial weight.\\
+
+\subsubsection{Different currencies}
+The last generalisation is to consider the currency of the portfolio. Given an initial currency, in order not to be exposed to the exchange rate risk, let's assume that we are in forward swaps that we roll until maturity if a bond is in the same currency as the portfolio.\\
+
+\subsubsection{Default impact}
+In order to be able to optimally consider the true impact of defaults when considering a portfolio, a modelling though copulas has been conducted.\\
+
+When the portfolio consists of several bonds, we have that the default of one bond may be correlated to the one of other ones of the same category. This is the reason why we need a model that take into account the correlation of the defaults.\\
+
+For this task we therefore consider a standard multi-factor Gaussian copula model : 
+\begin{equation*}
+    Y_i = \alpha_1\ F_1 + \alpha_2\ F_2 + \dots + \sqrt{1+\alpha_1^2 + \alpha_2^2 + \dots} \ \varepsilon_i \ .
+\end{equation*}
+Default occurs for all the bonds of the issuer $i$ when $Y_i \leq \Phi^{-1}(p_i)$, where $p$ is the probability of default (of the single bond, like the one considered previously).
+In this formulation each factor provides some correlation add-on (e.g. if $F_{\hat{i}}$ is the factor industry, two issuers belonging to the same industry will get a correlation add-on of $\alpha_{\hat{i}} ^2$). \\
+
+A copula is a multivariate cumulative distribution function for which the marginal probability distribution of each variable is uniform on the interval $[0, 1]$. We use copulas since they allow to model and estimate the distribution of random vectors by estimating marginals and copulas separately. \\
+
+\paragraph{Copula's definition}
+Copulas have been used widely in quantitative finance to model and minimise tail risk and portfolio-optimisation applications and the theoretical foundation for their application is the \textit{Sklar's theorem}. \\
+
+We call $C:[0,1]^{d}\rightarrow [0,1]$ a $d$-dimensional copula if $C$ is a joint cumulative distribution function of a $d$-dimensional random vector on the unit cube $[0,1]^{d}$ with uniform marginals.
+
+In analytic terms, $C:[0,1]^{d}\rightarrow [0,1]$ is a d-dimensional copula if
+\begin{itemize}
+    \item the copula is zero if any one of the arguments is zero:
+    \begin{equation*}
+        C(u_{1},\dots ,u_{i-1},0,u_{i+1},\dots ,u_{d})=0 \ ,
+    \end{equation*}
+    \item the copula is equal to $u$ if one argument is $u$ and all others $1$:
+    \begin{equation*}
+        C(1,\dots ,1,u,1,\dots ,1)=u \ ,
+    \end{equation*}
+    \item C is $d$-non-decreasing, which means that for each hyper-rectangle $B = \prod _{i=1}^{d} [x_{i},y_{i}] \subseteq [0,1]^{d}$ the $C$-volume of $B$ is non-negative:
+    \begin{equation*}
+        \int _{B}\mathrm {d} C(u)=\sum _{\mathbf {z} \in \prod _{i=1}^{d}\{x_{i},y_{i}\}}(-1)^{N(\mathbf {z} )}C(\mathbf {z} )\geq 0,
+    \end{equation*}
+    where the $N(\mathbf {z} )=\#\{k:z_{k}=x_{k}\}$.
+\end{itemize}
+
+Given this definition, \textit{Sklar's theorem} states that every multivariate cumulative distribution function
+\begin{equation*}
+    H(x_{1},\dots ,x_{d})=\mathbb{P}(X_{1}\leq x_{1},\dots ,X_{d}\leq x_{d})
+\end{equation*}
+of a random vector $ (X_{1},X_{2},\dots ,X_{d})$ can be expressed in terms of its marginals $F_{i}(x_{i})=\mathbb{P}(X_{i}\leq x_{i})$ and a copula $C$, i.e.
+\begin{equation*}
+    H(x_{1},\dots ,x_{d})=C\left(F_{1}(x_{1}),\dots ,F_{d}(x_{d})\right)\ .
+\end{equation*}\\
+
+In the particular case that the multivariate distribution has a density $h$, we have that
+\begin{equation*}
+    h(x_{1},\dots ,x_{d})=c(F_{1}(x_{1}),\dots ,F_{d}(x_{d}))\cdot f_{1}(x_{1})\cdot \dots \cdot f_{d}(x_{d}),
+\end{equation*}
+where $c$ is the density of the copula.\\
+
+\paragraph{Gaussian family}
+
+The Gaussian copula is a distribution over the unit cube $[0,1]^{d}$. It is constructed from a multivariate normal distribution over $\mathbb{R} ^{d}$ by using the probability integral transform.\\
+
+For a given correlation matrix $R\in [-1,1]^{d\times d}$, the Gaussian copula with parameter matrix $R$ can be written as
+\begin{equation*}
+    C_{R}^{\text{Gauss}}(u)=\Phi _{R}\left(\Phi ^{-1}(u_{1}),\dots ,\Phi ^{-1}(u_{d})\right)\ ,
+\end{equation*}
+where $\Phi ^{-1}$ is the inverse cumulative distribution function of a standard normal and $\Phi _{R}$ is the joint cumulative distribution function of a multivariate normal distribution with mean vector zero and covariance matrix equal to the correlation matrix $R$.\\
+
+While there is no simple analytical formula for the copula function, $C_{R}^{\text{Gauss}}(u)$, it can be upper or lower bounded, and approximated using numerical integration. The density can be written as
+\begin{equation*}
+    c_{R}^{\text{Gauss}}(u)={\frac {1}{\sqrt {\det {R}}}}\exp \left(-{\frac {1}{2}}{\begin{pmatrix}\Phi ^{-1}(u_{1})\\\vdots \\\Phi ^{-1}(u_{d})\end{pmatrix}}^{T}\cdot \left(R^{-1}-\mathbb{1}\right)\cdot {\begin{pmatrix}\Phi ^{-1}(u_{1})\\\vdots \\\Phi ^{-1}(u_{d})\end{pmatrix}}\right),
+\end{equation*}
+where $\mathbb{1}$ is the identity matrix.
+
+\paragraph{Credit defaults}
+In the correlation framework, we have that Moody’s pair-wise asset correlations are based on different factors:
+\begin{itemize}
+    \item \textbf{Rating}: It reflects the dependency between references irrespective of their industry or region (systemic risk), and is based on the rating of the reference credit. Fox example we may consider that all Investment Grade bonds are correlated.
+    \item \textbf{Industry}: It reflects additional dependency between references if they belong to the same industry and/or region.
+    \item \textbf{Region}: All other things equal, two reference assets in the same industry and region will have higher intra-correlation value than two references assets in different industries and/or regions.
+\end{itemize}
+
+The correlation resulting from the membership to the same \textit{rating} is supposed to be random (i.e. high, medium or low correlation states may exist). This means that there exist some states of the world where the correlation between issuers belonging to the same rating is low and other states of the world where this correlation is low : we interpret this part as representing the \textit{systemic risk}. \\
+
+\begin{center}
+\begin{tabular}{ c c c c }
+ & \textbf{low} & \textbf{medium} & \textbf{high} \\ 
+ \textbf{IG} & $5\%$ & $10\%$ & $20\%$ \\  
+ \textbf{Ba} & $3\%$ & $9\%$ & $12\%$  \\
+ \textbf{$\leq$ B} & $3\%$ & $7\%$ & $10\%$  \\
+\end{tabular}
+\end{center}
+\hfill
+\hfill
+
+The high, medium and low correlation states appear with the following probabilities :
+\begin{center}
+\begin{tabular}{ c c c }
+ \textbf{low} & \textbf{medium} & \textbf{high} \\ 
+ $70\%$ & $20\%$ & $10\%$ \\
+\end{tabular}
+\end{center}
+\hfill
+\hfill
+
+
+The correlation add-on over \textit{industry} and \textit{region factors} depends on the nature of the industry: \textit{local}, \textit{semi-local} and \textit{global}. Regions and industry nature classifications are given by Moody’s:
+\begin{center}
+\begin{tabular}{ c c c }
+ \textbf{\textit{industry category}}& \textbf{condition} & \textbf{add-on}\\ 
+ \textbf{local} & different region, same industry & $0\%$ \\  
+ \textbf{semi-local} & different region, same industry  & $6\%$  \\
+ \textbf{global} & different region, same industry & $12\%$  \\
+ \textbf{all} & same region, same industry & $12\%$  \\
+\end{tabular}
+\end{center}
+\hfill
+\hfill
+
+In order to take into account these add-ons, we introduce two factors $F_{\text{Industry}}$ and $F_{\text{Regional Industry}}$:
+\begin{align*}
+     Y_i = \alpha(\text{Rating})\ F_{\text{Rating}}\ + \
+     \beta(\text{Ind.cat.})\ F_{\text{Industry}} \ + \
+     \gamma(\text{Ind.cat.})\ F_{\text{Regional Industry}} \ + \\
+     +\ \sqrt{1+\alpha^2 + \beta^2 +\gamma^2} \ \varepsilon_i \ .
+\end{align*}
+\hfill
+\hfill
+
+\begin{center}
+\begin{tabular}{ c c c }
+ \textbf{\textit{industry category}}& $\beta^2$ & $\gamma^2$\\ 
+ \textbf{local} & $0\%$ & $12\%$ \\  
+ \textbf{semi-local} & $6\%$ & $6\%$  \\
+ \textbf{global} & $12\%$ & $0\%$ \\
+\end{tabular}
+\end{center}
+\hfill
+\hfill\hfill
+
+Therefore we can arrive to the simulation of a variable $Y_i$ this way:
+\begin{itemize}
+    \item Simulate a uniform random variable in $[0,1]$ to determine the global level of correlation (high / medium / low) : 
+    \begin{equation*}
+        \alpha(\text{Rating})\ ;
+    \end{equation*}
+    \item Retrieve all the ratings of the portfolio and generate independent Gaussian laws
+    \begin{equation*}
+        (F_{IG}, F_{Ba},F_{B\rightarrow D})\ ;
+    \end{equation*}
+    \item Retrieve all the industries of the portfolio and generate independent Gaussian laws 
+    \begin{equation*}
+        (F_{\text{Finance}},F_{\text{Electricity}},F_{\text{Aerospatial}},\dots)\ ;
+    \end{equation*}
+    \item Retrieve all the regions of the portfolio and generate $n_{\text{Industries}}\times n_{\text{Regions}}$ independent Gaussian laws
+    \begin{equation*}
+        (F_{\text{Finance,Europe}}, F_{\text{Finance, North America}}, F_{\text{Finance, Asia}}, F_{\text{Electricity, Europe}},\dots) \ ;
+    \end{equation*}
+    \item Generate noise $\varepsilon_i$ for each issuer;
+    \item Determine whether default happened : if $Y_i \leq \Phi^{-1}(p_i)$, than we have the default of the issuer.  
+\end{itemize}
+
+%------------------------------------------------------------------------------------
+
+\newpage
+
+\section{Credit project}
+The second part of the period spent at BNP Paribas Asset Management was aimed at building a model using credit factors that could explain the cross-section of corporate bond expected returns for the U.S. and Euro Investment Grade and U.S. High Yield universes. The goal was to properly recover fundamental values and elaborate them in order to understand whether or not it could be advantageous to go and invest in a particular company.\\
+
+\subsection{Introduction}
+Following the literature, we know that returns can be explained by factors. The main theory of which this study a generalization is the \textit{capital asset pricing model} (CAPM). This theory is used to determine a theoretically appropriate required rate of return of an asset, and to make decisions about adding assets to a well-diversified portfolio.\\
+
+\paragraph{Capital asset pricing model}
+The CAPM (Capital Asset Pricing Model) is a mathematical model of portfolio theory, which takes into account the asset's sensitivity to non-diversifiable risk (also know as \textit{systematic risk} or \textit{market risk}), represented by the quantity \textit{beta}, as well as the expected return of the market and the expected return of a theoretical risk-free asset. \\
+
+In detail, considering a simplified world where there are no taxes and transaction costs and where investors have both the same investment horizon and the same views on expected returns and risk, the market portfolio will be the efficient one. In this world, when investing in a security, two types of risks can be encountered:
+\begin{enumerate}
+    \item \textit{diversifiable} or \textit{idiosyncratic risk}, type of risk that can be eliminated by investing in a portfolio of financial assets;
+    \item \textit{systemic risk},type of risk implicit in the investment of a specific financial asset, it is also called market risk, and it cannot be eliminated through diversification.
+\end{enumerate}
+
+Assuming to invest in the entire stock market with the purchase of a mutual fund, the first type of risk would be eliminated through diversification. However, one would still be exposed to systemic risk, as the stock market performance is influenced by the conditions of the economic system and, consequently, the expected return on the stock market will be higher than the risk-free rate.\\
+
+The CAPM model allows us to find the expected return on a security n as the sum of the risk-free rate and a risk premium expressing non-diversifiable risk. The premium will depend heavily on a beta coefficient that measures the responsiveness of a security's return to market movements. The higher the beta coefficient, the higher will be the expected return on the n asset because it has a higher degree of non-diversifiable risk. An investor will therefore demand a higher expected return in order to hold a riskier financial asset.\\
+
+\paragraph{Fama and French generalization}
+One of the main generalizations of this model was given by Fama and French in their \textit{three-factor model} describing stock returns. This description is done through: market risk; the outperformance of small-cap companies relative to large-cap companies; and the outperformance of high book-to-market value companies versus low book-to-market value companies. The rationale behind the model is that high value and small-cap companies tends to regularly outperform the overall market. Its mathematical representation is:
+\begin{equation*}
+    r = r_f + \beta_1\ (r_m - r_f)+\beta_2\ SMB +\beta_2\ HML + \varepsilon
+\end{equation*}
+where $r$ is the expected rate of return, $r_f$ the risk-free rate, the $\beta_i$ are the different sensitivities, $(rm – rf)$ the market risk premium, $SMB$ (Small Minus Big) the historic excess returns of small-cap companies over large-cap companies, $HML$ (High Minus Low) the historic excess returns of value stocks (high book-to-price ratio) over growth stocks (low book-to-price ratio) and $\varepsilon$ the actual risk.\\ 
+
+\paragraph{Our journey}
+We can divide the path that led us to this end in the following steps:
+\begin{enumerate}
+    \item analysis of the data associated with each issue, available from the Bank of America Merrill Lynch database;
+    \item filtering of this data in order to obtain an investable universe;
+    \item aggregation of such data with respect to the market value of each issuer in order to obtain a signal as an aggregate of issues per issuer;
+    \item analysis of the data coming from Worldscope in order to recover the fundamental values suitable for the construction of the various factors;
+    \item management of the reporting problem and construction of the various factors;
+    \item division of them in 8 styles and their analysis;
+    \item purification of factor data by neutralizing a number of risk biases that are present in the factors: controlling for sectors, option-adjusted spread (OAS), duration and size biases
+    \item testing of factors, selection of the most significant for performance, model construction.
+\end{enumerate}
+
+\subsection{Data}
+
+In order to collect the history of prices for corporate bond markets, we considered the Bank of America Merrill Lynch (\textit{BofAML}) database. From this we collected specific data such as prices, duration, maturity, OAS and ratings. The \textit{BofAML} database offers extensive coverage of a complete range of individual bond issues across all liquid bond markets and is widely used by fixed income asset managers for benchmarking purposes and the calculation of portfolios’ net asset values. Moreover, one of the reasons we focused in this database was the free of survivorship bias: whenever a company defaults, the returns of its bonds are based on their final traded price, reflecting the market’s expected recovery rate.\\
+
+The analysis we performed then was done on three separate universes allowing us to test for the robustness of the results while limiting data snooping. We used indices from \textit{ICE BofAML} and relied on their history of index constituents. Factor performances were measured for three largest credit universes with bonds of comparable seniority: Merrill Lynch U.S. Investment Grade index (\textit{C0A0}), Merrill Lynch Euro Investment Grade index (\textit{ER00}) and Merrill Lynch U.S. High Yield index (\textit{H0A0}). Due to the small number of issuers and issues in the Euro HY universe, we did not include it in our analysis.\\
+
+For the all three universes we used data starting in January 2004 through October 2020, using monthly.\\
+
+Fundamental data for the company issuers was taken from \textit{Worldscope} database. This database was linked to the \textit{BofAML} one to ensure the link of each bond to its obligor through time, which required carefully taking into account the impact of mergers and acquisitions throughout history. This was of key importance to ensure the correct assessment of the relevance of factors based on fundamental company data behind a given bond. The fact that a particular bond keeps its name through maturity even when its issuer company changes name, e.g. because of merger or acquisition, adds to the difficulty of creating such link, in particular since relying on CUSIP and tickers is not sufficient to produce good coverage and a reliable history.\\
+
+\subsection{Credit Factors}
+
+We analysed a big number of factors in order to select the best ones. We consider 109 factors, dividing them into 8 different styles, with fundamental data from the Worldscope database.\\
+
+The construction of the families has passed through two phases:
+\begin{enumerate}
+    \item The first stage was the analysis of these data in an economic sense:
+    \begin{itemize}
+        \item the investigation of different economic indicators that could be predictors of a spread movement - this analysis was based on studies conducted by BNP in the construction of their models and current literature;
+        \item their aggregation into the different styles according to their economic meaning and the type of feature that could influence a spread movement.
+    \end{itemize} 
+    \item The second was a type of a posteriori analysis:
+    \begin{itemize}
+        \item construction of the different factors starting from the fundamental economic factors (such as the size of the debt issued);
+        \item analysis of the correlation between the various factors: we went to consider the correlation matrix of our factors and averaged it out for each month of the period considered;
+        \item we looked for a strong correlation (both positive and negative) between elements of the same class and low correlation (close to 0) for factors belonging to two different groups, conducting a type of a posteriori verification that resulted satisfactory.
+    \end{itemize}
+\end{enumerate}
+
+\begin{figure}[h]
+\caption{\small Sub-matrix of the correlation matrix in which we see the quantities towards 1 and -1 being of a more intense red and the quantities towards 0 coloured in white. Squared we can see the factors belonging to the same style. We can see a differentiation between the quantities inside and outside the boxes, as an a posteriori check on the goodness of such groupings.}
+\includegraphics[width=13cm]{correlation matrix.PNG}
+\centering
+\end{figure}
+
+One of the fundamental characteristics that we have taken into account during the study of the factors is the role of each of them in predicting the movements of the spread. When this factor predicts a decrease in the spread, we call it a "follower". If not, we call it "antagonist". A high coefficient of a follower factor predicting a decrease in the spread indicates a positive return on that company's investment. Thanks to this analysis we want to classify the companies in which we want to have a long position in the portfolio and a short position. \\
+
+In order to better understand the type of study conducted in each class, let's investigate two families: \textit{value} and \textit{momentum}.
+
+\subsubsection{Value}
+The value style is about investing in cheap securities. We considered two types of value factors.\\
+
+The first favours bonds with a larger OAS relative to a fair value OAS obtained from a cross-sectional regression at a given date of the log(OAS) against the time to maturity of each bond, and the \textit{distance to default} (D2D) of each company. Bonds with an OAS larger than fair value OAS are more attractive as their OAS is expected to close the gap.\\
+
+The second type of value factor aims at identifying value traps, i.e. companies that may appear to be cheap based on traditional value measures such as book-to-price, cash-flow yield, earnings yield or sales yield, but are in fact cheap because they are closer to default. Avoiding the companies with the larger values of these ratios will likely exclude such companies.
+
+\subsubsection{Momentum}
+
+As in value, we use two types of momentum. The first is based on the performance of the company in the equity markets. We prefer bonds from companies that outperform their peers in the equity markets in the medium term (six to 12-month horizon). However in the short term, we prefer bonds from companies that just under-performed.\\
+
+The second type is fundamental momentum: we prefer bonds from companies with stronger earnings revisions momentum, a stronger annual change in long-term earnings growth forecasts standardised by the annual volatility of those same forecasts, a stronger annual change in earnings per share standardised by the volatility of the annual changes in earnings per share, and an annual change in free cash-flow standardised by the volatility of the annual changes in free cash-flow.
+
+
+\begin{figure}[h]
+\includegraphics[width=12cm]{factors.PNG}
+\centering
+\end{figure}
+
+\subsection{Efficacy test}
+
+To test the \textit{efficacy} of the credit factors in predicting the cross-section of corporate bonds returns, we relied on monthly re-balanced \textit{long-short portfolio} strategies where the portfolios are long the bonds with higher expected returns and short the bonds with lower expected returns. \textit{Positive and significant average returns} for such portfolio strategies indicate that the factors do appear to have predictive power for the cross-section of returns.
+
+\subsubsection{Investible universe}
+
+We first define the universe of bonds in which the strategy can invest. For that, we start with all bonds in the respective Merrill Lynch index at a given date and remove all non-senior debt because these bonds are not comparable to senior bonds. Then we remove low face value bonds for liquidity reasons and bonds with too long a time to maturity because there are too few of them.\\
+
+The filtered universe for U.S. Investment Grade is composed of about 1,000 bonds from 350 issuers at the start of the period and about 3,000 bonds from 700 issuers at the end of 2017. For Euro Investment Grade there are about 250 bonds from 150 issuers at the start of the period and about 1,000 bonds from 350 issuers at the end. The U.S. High Yield universe includes about 200 bonds from 100 issuers at the start and 600 bonds from 300 issuers at the end.\\
+
+Once we have determined the group of bonds in which we can go and invest, we must go and define variables like OAS and Duration at issuer level, just like the data coming from Worldscope database, in order to compare the two type of quantities. This aggregation is made by considering the size of each bond with respect to its market-value:
+\begin{equation*}
+    var_{issuer} = \frac{\sum_{issue} MktVal_{issue} \ var_{issue}}{\sum_{issue} MktVal_{issue}} \ .
+\end{equation*}
+
+
+
+\subsection{Neutralisation}
+
+In order to reduce unwanted risk exposures, we subject our factors to different stages of neutralisation with respect to various types of bias.
+
+\subsubsection{Sector and reporting standard biases}
+
+First, we want to neutralise \textit{sector} biases in factor data. The factor families previously created often comes with sector biases because of structural differences in sectors. Issuers in the same sector are more likely to be impacted similarly by shocks from macroeconomic variables that are not related to the factors we are considering here. Controlling for sectors reduces the noise generated by those risk variables adding robustness and should increase the efficacy of style factors since these cannot be expected to predict shocks to macro variables.\\
+
+The second characteristic according to which we want to be neutral is \textit{reporting standard}. In fact, according to the accounting standard to which we refer (\textit{International Financial Reporting Standards} - IFRS - or \textit{US Generally Accepted Accounting Principles} - GAAP) it happens that the factor can be influenced, without an actual counterpart on the performance point of view.
+
+The standard approach in this situation is de-meaning the factor data, a process common in equity factor studies that comprises subtracting the sector mean of the factor in the cross-section of a sector from all the bonds in that sector. In the case where the variables according to which we try to be neutral are more than one one should go to consider the various subgroups given by intersections of each category (for example in our case the belonging to a specific sector - e.g. utility - and accounting standard). However, this methodology has been unfeasible due to subsets with a low (if any) number of individuals in some universes. This is the reason why we had to go down a more robust path.\\
+
+Inspired by the Analysis of variance (ANOVA), we considered a \textit{linear regression} against the dummy variables corresponding to different sectors and reporting standards. In this description, if $\{sector_j\}_{j=1}^{p}$ is the set of the different sectors, $\{rpt\_std_k\}_{k=1}^{q}$ the one of the standard reporting (here $q=2$), at each date we have that a factor can be written this way 
+\begin{equation*}
+    ratio_i = \alpha \ + \ \sum_{j=1}^{p-1}\beta_{sector_j} \mathbb{1}_{i \in sector_j}\ + \ \sum_{k=1}^{q-1}\gamma_{rpt\_std_k} \mathbb{1}_{i \in rpt\_std_k}\ + \ \varepsilon_i \ ,
+\end{equation*}
+where we remove a class in each variable in order for the writing to be unique.\\
+
+Reached such a writing, therefore, we consider the neutralised ratio as
+\begin{equation*}
+    neutr\_ratio_i = ratio_i - \bigg(\alpha \ + \ \sum_{j=1}^{p-1}\beta_{sector_j} \mathbb{1}_{i \in sector_j}\ + \ \sum_{k=1}^{q-1}\gamma_{rpt\_std_k} \mathbb{1}_{i \in rpt\_std_k}\ \bigg) = \varepsilon_i \ .
+\end{equation*}
+
+\paragraph{Regression} The linear regression is a process that estimates the closest linear combination between a dependent variable $y$ and one or more independent variables $\{X_i\}_i$ according to a the method of ordinary least squares. This mathematical criterion computes the unique hyper-plane that minimises the sum of squared differences between the true data and that hyper-plane.\\
+
+Linear regression has many practical uses. Most applications fall into one of the following two broad categories:
+\begin{itemize}
+    \item \textit{Prediction}, \textit{forecasting}, or \textit{error reduction}: linear regression can be used to fit a predictive model to an observed data set of values of the response and explanatory variables; after developing such a model, if additional values of the explanatory variables are collected without an accompanying response value, the fitted model can be used to make a prediction of the response.
+    \item explain variation in the response variable that can be attributed to variation in the explanatory variables: this analysis can be applied to quantify the strength of the relationship between the response and the explanatory variables, and in particular to determine whether some explanatory variables may have no linear relationship with the response at all, or to identify which subsets of explanatory variables may contain redundant information about the response.
+\end{itemize}
+
+It is precisely in this second interpretation that we try to make use of it, trying to determine how much membership of a particular industry or standard reporting has an impact on our explanatory variable.\\
+
+In order to fall into the case of linear regression it is necessary to impose certain assumptions about the predictor variables, the response variables and their relationship. These are the major assumptions for standard estimation techniques (e.g. \textit{ordinary least squares}):
+\begin{itemize}
+    \item \textit{Linearity}: the response variable is a linear combination of the parameters (regression coefficients) and the predictor variables. The predictor variables can be arbitrarily transformed, and in fact multiple copies of the same underlying predictor variable can be added, each one transformed differently. This technique is used, for example, in polynomial regression, which uses linear regression to fit the response variable as an arbitrary polynomial function (up to a given rank) of a predictor variable. However, with this much flexibility, models such as polynomial regression often tend to over-fit the data. As a result, some kind of regularisation must typically be used to prevent unreasonable solutions coming out of the estimation process. Common examples are ridge regression and lasso regression.
+    \item \textit{Homoscedasticity}: different values of the response variable have the same variance in their errors, regardless of the values of the predictor variables. In practice this assumption is invalid (i.e. the errors are heteroscedastic) if the response variable can vary over a wide scale. Therefore there will be a systematic change in the absolute or squared residuals when plotted against the predictive variables. Errors will not be evenly distributed across the regression line. Heteroscedasticity will result in the averaging over of distinguishable variances around the points to get a single variance that is inaccurately representing all the variances of the line.
+    \item \textit{Independence of errors}: errors of the response variables are uncorrelated with each other. Actual statistical independence is a stronger condition than mere lack of correlation and is often not needed, although it can be exploited if it is known to hold.
+    \item \textit{Lack of perfect multicollinearity} in the predictors: the design matrix $X$ must have full column rank $p$; otherwise, we have a condition known as perfect multicollinearity in the predictor variables. In the case of perfect multicollinearity, the parameter vector $\beta$ will be non-identifiable—it has no unique solution. This type of hypothesis is of particular relevance and is at the basis of the numerical resolution of the problem in matrix form such as 
+    \begin{equation*}
+        \hat{\beta} = (X^T X)^{-1}X^T y \ .
+    \end{equation*}
+    It is therefore for this reason that in the construction of the dummy variables we have dealt with the elimination of one of them for both the sectors and the reporting standards. 
+\end{itemize}
+
+\subsubsection{FZ score}
+Now that the residuals have been constructed using linear regression, the aim is to determine the aberrant residuals and bring them closer to the cloud. A modified $Z$-score is used for this, which will be called $FZ$-score later on. If we call $z$ the residuals of this regression, that given the hypotheses of linear regression, we suppose follow a normal law, $I$ the set of issuers, and $z = \{z_i\}_{i_in I}$, the $FZ$-score at t of the universe is defined by :
+\begin{equation*}
+    FZ(z) = \frac{z \ - \ \text{median}(z)}{\hat{\sigma}} \quad \text{with} \ \hat{\sigma} = k \times \text{MAD}
+\end{equation*}
+where $k = 1/(\Phi^{-1}(3/4))\approx 1.48$, $\Phi$ is the quantile function of a standard normal distribution $X = \frac{z-\text{mean}(z)}{\text{std}(z)}~\mathcal{N}(0,1)$ and the $\text{MAD}$ is the \textit{median absolute deviation}, defined as
+\begin{equation*}
+    \operatorname {MAD} =\operatorname {median}_{i \in I} (|z_{i}- \operatorname{median}_{j \in I} (z_{j}) |) \ .
+\end{equation*}
+
+The argument $3/4$ is such that $\operatorname {MAD}$ covers $50\%$ (between $1/4$ and $3/4$) of the standard normal cumulative distribution function, i.e.
+\begin{align*}
+    \frac {1}{2}=\mathbb{P}(|z -\text{mean}(z) |\leq \operatorname {MAD} ) = 
+    \mathbb{P}\bigg(\frac {|z -\text{mean}(z) |}{\text{std}(z)} \leq \frac {\operatorname {MAD}}{\text{std}(z)}  \bigg) = \\ 
+    = \mathbb{P}\bigg(|X| \leq \frac {\operatorname {MAD}}{\text{std}(z)}  \bigg)
+\end{align*}
+
+Therefore, we must have that
+\begin{align*}
+    \Phi (\operatorname {MAD} /\sigma )-\Phi(-\operatorname {MAD} /\sigma )=1/2\ .
+\end{align*}
+
+However, taking into notice the symmetry of normal distribution, we have 
+\begin{align*}
+    \Phi (-\operatorname {MAD} /\sigma ) = 1- \Phi(-\operatorname {MAD} /\sigma ) \ ,
+\end{align*}
+and knowing that  $\operatorname {MAD} /\sigma =\Phi ^{-1}(3/4)\approx 0.67449$, we obtain the scalar factor $k = 1/(\Phi^{-1}(3/4))\approx 1.48$. \\
+
+It is easy to understand the usefulness of such a score: a classic $Z$-score
+\begin{equation*}
+    Z(z) = \frac{z \ - \ \text{mean}(z)}{\text{std}(z)} \ .
+\end{equation*}
+would not be appropriate because the average would be biased by the presence of outliers, whereas the median is robust to the presence of outliers.
+
+\paragraph{Outliers elimination}
+The procedure we apply to eliminate outliers comes from some considerations on the Gaussian law $\mathcal{N}(0.1)$. In fact, we know that for such a distribution, there is over $95\%$ probability to belong to the interval $[-2,2]$. We then impose the occurrences of our ratio to be exactly in this range once the $F$ score has been calculated.
+\begin{gather*}
+    -2 \leq \frac{ratio_i \ - \ \text{median}(ratio)}{1.48 \ \text{MAD}} \leq 2 \\
+    -2\ * 1.48 \ \text{MAD} \leq ratio_i \ - \ \text{median}(ratio)  \leq 2 \ * 1.48 \ \text{MAD} \\
+    \text{median}(ratio) \ - \ 2\ * 1.48 \ \text{MAD} \leq ratio_i  \leq \text{median}(ratio) \ + \ 2\ * 1.48 \ \text{MAD}  \ .
+\end{gather*}
+
+We then consider the following transformation to 
+\begin{equation*}
+    z_i = \min( \ \max(ratio_i , \text{median}(ratio) \ - \ 2\ * 1.48 \ \text{MAD})\ , \text{median}(ratio) \ + \ 2\ * 1.48 \ \text{MAD} \ ) 
+\end{equation*}
+and on this sample $z = \{z_i\}_i$ we compute a $Z$ score transformation to have \textit{fundamental score}$\{\zeta_i\}_i$ associated to this ratio
+\begin{equation*}
+    \zeta_i = \frac{z_i \ - \ \text{mean}(z)}{\text{std}(z)} \ .
+\end{equation*}
+
+
+\subsubsection{Exposure}
+
+It is possible that the long-short portfolios constructed from factors exhibit strong \textit{OAS} and \textit{duration biases}. These are well-known risk variables that also impact corporate bond returns. Thus, it is important to neutralise exposures to OAS and duration if we wish to assess the efficacy of the style factors beyond any duration or OAS biases they may create. That is why we also control explicitly for OAS and duration. \\
+
+From a risk point of view we have from literature that controlling for \textit{duration times spread} (DTS) should be enough to control for market exposure. Controlling for both OAS and duration is found to be superior as a form of controlling for the impact of these risk variables.
+Finally, we also control for the size, which is a variable that could impact liquidity and thus returns. \\
+
+The first that we check then is whether such a bias was present in our scores. In order to verify whether or not such a bias was present, we have calculated the weighted sum with respect to the OAS score and duration with respect to the weights given by the fundamental score:
+\begin{gather*}
+    bias_{\text{OAS}} = \sum_{\text{issuer}} \text{OAS}_{\text{issuer}} \ \zeta_{\text{issuer}} \ ,\\
+    bias_{\text{Dur}} = \sum_{\text{issuer}} \text{Dur}_{\text{issuer}} \ \zeta_{\text{issuer}} \ .
+\end{gather*}
+
+Looking at these graphs then we can see how such a bias for the spread is evident.
+
+\begin{figure}[h]
+\caption{\small Graph of the exposure of the fundamental score with respect to OAS as a function of time on the three universes of consideration.}
+\includegraphics[width=12cm]{Bias fundamental score - OAS.png}
+\centering
+\end{figure}
+
+On the other hand, as far as duration is concerned, we do not see a bias that is explicit. However, in order to put ourselves in a neutral position with respect to the market we decide to neutralize this exposure as well.
+
+\begin{figure}[H]
+\caption{\small Graph of the exposure of the fundamental score with respect to duration as a function of time on the three universes of consideration.}
+\includegraphics[width=12cm]{Bias fundamental score - Duration.png}
+\centering
+\end{figure}
+
+The approach for such a neutralization is again regression of the fundamental score $\{\zeta_t\}_t$ against OAS and duration variables and take the residue of that transformation. Given the explosive nature of the spread, we decide to consider the logarithm of the spread against which to make the regression in order to have a more homogeneous distribution of this variable and not a high concentration for small values.
+
+\begin{equation*}
+    \zeta_i = \theta \ + \ \nu \ \log(\text{OAS})_i \ + \ \mu \ \text{Dur}_i \ + \ \widetilde{\varepsilon}_i \ .
+\end{equation*}
+
+Therefore, let's define the new relative value score as follows: 
+\begin{equation*}
+    \text{rel\_score}_i := \zeta_i \ - \ \bigg( \theta \ + \ \nu  \ \log(\text{OAS})_i \ + \ \mu \ \text{Dur}_i \bigg) = \widetilde{\varepsilon}_i \ .
+\end{equation*}
+
+\begin{figure}[H]
+\caption{\small Graph of the fundamental score for a given date and Euro IG universe and the regression line with respect to the log(OAS) against which we are going to neutralize.}
+\includegraphics[width=12cm]{regression OAS.PNG}
+\centering
+\end{figure}
+
+Finally, in order to remove any outliers, let's calculate the FZ score of these values again.
+
+\subsection{Factor selection}
+
+The first thing we have to deal with is the selection of a group of factors among the 109 built. We do so assessing the efficacy of forecasting the cross-section of bonds returns in each of these universes by applying the different long-short portfolio strategies described in the efficacy test section. All information ratios presented are based on the average annual alpha generated from the long-short portfolio strategies divided by the annualised volatility of the residual of the regression used to calculate the alpha. In this regression, we use the monthly returns generated in historical simulations by the portfolio strategies against the returns of the equally weighted universe.\\
+
+By building portfolios this way, the size of the long leg is not supervised. This, when I go to consider the positive weights, exposes me to a variable amount of risk over time, which will affect my returns, especially in times of crisis. In order to have a constant amount of risk over time, we require the exposition of positive scores to DTS to be constant over time, by reweighing the weights of the entire portfolio.
+\begin{equation*}
+    \sum_{\text{issuer}}\ \text{rel\_score}^+_{\text{issuer}}\ \text{DTS}_{\text{issuer}} = const,\ \forall t \ .
+\end{equation*}
+
+The elements on which we have paid most attention are the IR of such a portfolio, the cumulated alpha over time and the draw-down of such a strategy. In order to give more clarity to these results, let us briefly introduce these three key concepts.
+
+% \subsubsection{Markovitz portfolio}
+
+
+\subsection{Model selection}
+
+Thanks to the analysis of the styles previously conducted, the strategy used for the selection of ratios is to select the best factors within each family. In fact, thanks to the control implemented on the correlation matrix (concentration of quantities close to $1$ and $-1$ in the diagonal blocks, determined by the definition of the styles) we can work separately on each group. Within each group the criterion for selecting the best ratio was the \textit{IR}: once we went to build the long-short portfolio we went to consider its average alpha and IR for each universe.\\
+
+Taking as an example the two families previously considered (\textit{Momentum} and \textit{Value}) we have that, once we have gone to calculate the IR, the resulting factors the best are \textit{12 months - 1 month alpha} and \textit{Sales to price}. \\
+
+\begin{figure}[H]
+% \caption{\small }
+\includegraphics[width=12cm]{styles IR.PNG}
+\centering
+\end{figure}
+
+Once for each family a factor had been selected, we construct the first model, composed of the average of the scores, taken with their sign according to the follower or antagonist character of the indicator. Once this first model has been built, we enter the individual investigation of each family. In fact, we want to understand whether within the same family exist other factors whose explanatory power is not completely captured by the factor with the best IR. This happens when a second ratio is characterized by an interesting \textit{IR} and the correlation between this factor and the one already selected is low (less than $0.5$).\\
+
+\begin{figure}[H]
+% \caption{\small }
+\includegraphics[width=13.5cm]{matrix_correl_ir_momentum.PNG}
+\centering
+\end{figure}
+
+In these specific cases, as in the case of the \textit{Momentum} family, we are going to test the performance of the single factor taken individually and those of the average of the two factors. As we can see later on the cumulated alpha curves are very close to each other two we decide to go and consider both factors with regard to this family.\\
+
+\begin{figure}[H]
+\caption{\small Curves of the accumulated $\alpha$ of the long-short portfolios built with the Momentum family factors, respective draw-downs and differences in the accumulated $\alpha$ curves as time goes by on the three universes for the \textit{Momentum} family.}
+\includegraphics[width=14cm]{alpha_cum momentum.PNG}
+\centering
+\end{figure}
+
+When, on the other hand, we focus on the \textit{value} style, we see that not only one other factor but two are highlighted for low correlation and relevant IR: \textit{Sales to Price}, \textit{Book to Price} and \textit{Reported earnings to price}. For this reason we are going to consider three different models by averaging the three different factors, just the two factors or simply considering \textit{Sales to price}.\\
+
+\begin{figure}[H]
+% \caption{\small }
+\includegraphics[width=13.5cm]{matrix_correl_ir_value.PNG}
+\centering
+\end{figure}
+
+\begin{figure}[H]
+\caption{\small Curves of the accumulated $\alpha$ of the long-short portfolios built with the Momentum family factors, respective draw-downs and differences in the accumulated $\alpha$ curves as time goes by on the three universes for the \textit{Momentum} family.}
+\includegraphics[width=14cm]{alpha_cum value.PNG}
+\centering
+\end{figure}
+
+We can note that having two factors adds to performance in the Euro Investment Grade (EU-IG) and U.S. High Yield (US-HY) universes. Considering instead U.S. Investment Grade we see that there is not much difference between considering one or two factors, except for an increase in draw-down in recent years. This is why we decide to add Book to price to our model. Considering the three-factor model, however, we notice a significant degradation of performance in the US-HY universe and for this reason we decide to have only two factors in such a family. \\
+
+By proceeding in this way for the other families, we finally obtain a model consisting of the following factors: \textbf{asset growth in the last year}, \textbf{cash plus marketable securities over debt}, \textbf{net debt over EBITDA}, \textbf{fixed charge coverage,} \textbf{12 months minus 1 month alpha}, \textbf{momentum relative to the 52 weeks high}, \textbf{debt over book capitalisation}, \textbf{net profit after tax before unusual expense over sales}, \textbf{total assets}, \textbf{sales to price}, \textbf{book to price}. Each factor is taken with a weighted average in order to give the same weight to each family and divide the weights within it equally. \\
+
+Testing the performances of such a choice, we see that we obtain good feedback.
+\begin{figure}[H]
+\includegraphics[width=11.5cm]{cum alpha eu_ig.png}
+% \centering
+% \end{figure}
+% \begin{figure}[H]
+\includegraphics[width=11.5cm]{cum alpha us_hy.png} 
+% \centering
+% \end{figure}
+% \begin{figure}[H]
+\includegraphics[width=11.5cm]{cum alpha us_ig.png} 
+\centering
+\end{figure}
+
+
+\subsection{Significance}
+After selecting the factors and building the model, we went to test the qualities of the two regressions made to understand the impact of these two transformations.\\
+
+The first test carried out was to perform the selection of factors by changing methodology with respect to the regression over the dummy variables of sectors and reporting standard. We partitioned each universe and for each subgroup of the Cartesian product $\{sector\}_i^p\times\{rpt\_std\}_j^q$ we removed the median of that set. We therefore observed that by doing so, the IR produced by each factor was crushed to zero. Such a phenomenon is due to the fact that the sub-sets are sometimes too small to obtain a median of such a group with a physical sense. For this reason we have pushed to maintain the regression in this phase of indicator construction as this operation has shown greater robustness. \\
+
+The second analysis carried out was the study of the coefficients estimated by regression against OAS and duration variables and the understanding of their meaning. Looking at the significance of these coefficients, we could not only understand how important the bias of these variables is, but also understand what kind of correction was needed to correct such an exposure.\\
+
+We can note that if the spread and intercept are for the duration of the period considered significant, this is not the case for duration. However, we decide to continue to neutralise with respect to the duration given in order to place ourselves in a neutral position with respect to the risk given by the market. \\
+
+\begin{figure}[H]
+\includegraphics[width=4.75cm]{significance df.png}
+\centering
+\end{figure}
+
+By using regression we can decompose the fundamental score obtained after removing the sector impact and reporting standard one into the following form:
+\begin{equation*}
+    \zeta_i = \theta \ + \ \nu \ \log(\text{OAS})_i \ + \ \mu \ \text{Dur}_i \ + \ \widetilde{\varepsilon}_i \ .
+\end{equation*}
+
+\begin{figure}[h]
+\caption{\small Graph of the estimated coefficients and relative p-values through time for the $\theta$ coefficient corresponding to the intercept.}
+\includegraphics[width=12cm, height = 7cm]{significance intercept.png}
+\centering
+\end{figure}
+
+\begin{figure}[H]
+\caption{\small Graph of the estimated coefficients and relative p-values through time for the $\nu$ coefficient corresponding to the spread.}
+\includegraphics[width=12cm, height = 7cm]{significance spread.png}
+\centering
+\end{figure}
+
+\begin{figure}[H]
+\caption{\small Graph of the estimated coefficients and relative p-values through time for the $\mu$ coefficient corresponding to the duration.}
+\includegraphics[width=12cm, height = 7cm]{significance duration.png}
+\centering
+\end{figure}
+
+We can remark at first glimpse that we have a constant negative impact of $\nu$, the coefficient of the spread. This sign is perfectly in line with the kind of negative exposure previously analysed of the OAS. Both looking at the exposures and at the p-values, we understand how OAS is the variable to which we are more exposed to than duration. Through time, in fact, we often have that $\mu$ can be significantly considered zero. However, in stressed periods, like through the 2008 crisis for the U.S. High Yield universe, this coefficient is not negligible. This shows that during unstable periods this variables is used to adds stability. \\
+
+Dividing the previous equation by $\nu$ and isolating the spread term we have a relationship between spread and duration. In particular this equation tells us of how much we need to correct the spread by the duration to remove the market impact on the scores.
+\begin{equation*}
+    \log(\text{OAS})_i = -\frac{\mu}{\nu} \ \text{Dur}_i \ -\ \frac{\theta}{\nu} \ + \frac{1}{\nu}  \zeta_i  \ - \ \frac{ \widetilde{\varepsilon}_i }{\nu}
+\end{equation*}
+
+\subsection{Size effect}
+Once developped the first version of the model, we presented it to the portfolio managers that will use its results in order to have a better understanding on which company to invest in. We analysed a portfolio they have and the benchmark they reference to to understand, sector by sector, where they stand in their actual investments and to check whether they find themselves in line with our suggestions or not.\\
+
+\begin{figure}[H]
+\caption{\small Example of analysis done for the month of September over the sector of \textit{Consumer goods} for an example of portfolio used by portfolio managers to understand their positions sector by sector for relative score in function of their spread.}
+\includegraphics[width=10cm]{portfolio analysis.PNG}
+\centering
+\end{figure}
+
+One on the remark that arose from this meeting has been a possible size bias on our output. Seeing in detail which company had a better score than the others, sometimes small size issuers were much better rated than larger ones and therefore that a neutralization over this variable was needed.
+
+\subsubsection{Selection of the measurement}
+The first question we needed to answer was to understand how to see, if there was, such a bias in our output and how to solve this possible exposure. The methodology put in practice for these purposes was deciding how to measure the size of an issuer and later normalise against this variable. The selected fields we considered were: the market-value, the face-value and the debt of the company.\\
+
+Market-value is the price an asset would fetch in the marketplace, or the value that the investment community gives to a particular equity or business. Market-value is also commonly used to refer to the market capitalisation of a publicly traded company, and is calculated by multiplying the number of its outstanding shares by the current share price. A company’s market value is a good indication of investors’ perceptions about its business prospects.\\
+
+Face value is the nominal or dollar value of a security, as stated by its issuer. For stocks, the face value is the original cost of the stock, as listed on the certificate. Face value is equal to a bond's price when it is first issued. After that, the price of the bond fluctuates in the market in accordance with changes in interest rates while the face value remains fixed.\\
+
+The debt issued represents all interest bearing and capitalised lease obligations. It is the sum of long and short-term debt.\\
+
+\paragraph{Same issuer in different markets}
+Over these factors, the first two are taken by the database of \textit{BoAML}, whereas the third one is from \textit{WordlScope}. Over their nature, we have that the first two are available at an issue level and are aggregated at issuer level taking the sum over all the bonds for a given issuer. On the other have the field "debt" is already referred to the whole company. This difference highlights an impact we have on the data we build when considering the three universes: a big company, like \textit{Apple} for example, can issue bonds both in the European market and in the American one. However, doing this the same company does not play the same role in both markets, having an importance and therefore a size that is different. In fact, an American company that issues in Europe as a side market has not the same importance it has in the U.S., having therefore a liquidity premium. In order then to keep in mind this different behaviour that a company may have, we choose to take one of the first two fields over the debt.\\
+
+Since a quantity like face-value is related to the bond and it does not fluctuate afterwards, we have that it much refers to the size of the issuer than the market value. In fact, having neutralised by spread and duration, we have scores that are already in a neutral position over the market. We do not want to consider a variable that is influenced by the market in its turn. For these reasons we decide that is wiser to consider the \textit{face-value} over market-value.\\
+
+Moreover, always to keep en eye over the power a single company have in a market, we decided to compute the size of an issuer considering the face-value of all the available bonds, and not only the ones considered investible.\\
+
+\subsubsection{Exposure}
+
+In order to understand whether both the neutralised scores over sector and reporting standard and the final scores also unbiased by OAS and duration presented a "size effect", we looked at the exposures over the three universes.\\
+
+\begin{figure}[H]
+\caption{\small Exposure with respect to the face-value of the score neutralised over sectors and reporting standard.}
+\includegraphics[width=12cm]{fv expo-eu_ig.png}
+\includegraphics[width=12cm]{fv expo-us_hy.png}
+\includegraphics[width=12cm]{fv expo-us_ig.png}
+\centering
+\end{figure}
+
+Looking at these graphs, it appeared clear that, as with OAS before its regression, our methodology presented a bias for small sized companies . In fact almost through the whole period of consideration we have a negative exposure that grows in magnitude for the three universes in the last 5 years. This phenomenon can be easily explained looking at the amount of issuers we have in each universe. The number of participants in these markets increase with time, of a lot of whom are small issuers.\\
+
+\paragraph{Distribution}
+The second aspect we focused on to understand this bias was looking at the distribution of the face-value.\\
+
+The clear peak towards zero can be seen in the three universes, fact that remarks that few companies are present in these markets with huge size with respect to the average issuer. On the other hand, considering a log-transformation of this variable we see that the variable is more homogeneous through the different sizes. For this reason we decided to neutralise against the log of this variable. \\
+
+\begin{figure}[H]
+\includegraphics[width=8cm, height=7.5cm]{distribution FV.png}
+\centering
+\end{figure}
+
+\subsubsection{Neutralisation}
+In order to remove this bias, we decided to add the logarithm of the face-value to the variables against whom we are doing the last regression, OAS and duration. Looking at the results we do not see a big impact doing this operation. However, even though the results do not show a clear improvement in the IR or in the alphas, we decided to keep on using this method for the final model.\\
+
+\begin{figure}[H]
+\includegraphics[width=8.5cm]{results neutr logFV.PNG}
+\centering
+\end{figure}
+
+\begin{figure}[H]
+\caption{\small Comparison of the curves of the cumulated alphas and respective draw-down for the strategies computed using the scores obtained with the regression against spread and duration and against spread, duration and face-value.}
+\includegraphics[width=12cm, height=8.5cm]{oas+dur vs oas+dur+fv.png}
+\centering
+\end{figure}
+\hfill
+
+\subsection{Conclusion}
+In this analysis, we studied 109 factors from eight different styles and showed that they play an important role in explaining the cross-section of future corporate bonds. We tested their efficiency in  three different universes: U.S. IG, Euro IG and U.S. HY.\\
+
+We focused over the importance to standardise factors so that biases for sector and reporting standard can be efficiently neutralised. This approach is based on using the regression in order to remove the impact each of these subgroup has in the economic data, in a robust way.\\
+
+Furthermore, we emphasise the importance of controlling for risk variables that are known also to play a role in explaining corporate bond returns as a means to increase the efficacy of the factor models. In particular, we propose that OAS, duration and size exposures are neutralised and demonstrate the superiority of the results when style factors are purified in this way.
+\newpage
+
+\section{Acknowledgements}
+First of all, I would like to thank the entire \textit{Quant Research Group} team at \textit{BNP Paribas Asset Management} for allowing me to discover in a pleasant way the challenging and exciting environment of finance and large companies, through its welcome and kindness. In particular, I would like to thank Thomas and Zine for accompanying me during my internship and Jules, Laure and Isaac for sharing these months with me always with a smile and hard work.\\
+
+Most of all I would like to thank Jean who, thanks to his expertise, passion and good humour, allowed me to spend a fruitful period, encouraging me to give my best. His kindness, persistence and always positive attitude allowed me to mature and overcome the moments of difficulty that the current pandemic presented.
+
+I would also like to thank the Fondation Sciences Mathématiques de Paris for giving me this incredible opportunity of living these two years in Paris. This experience allowed me to stimulate my mathematical curiosity to limits I could never thought possible reaching.\\
+
+From the people met during these two years in particular, I would like to thank the ones who have been closest to me and made me turn Paris into home. María José for the long afternoons in the library, always being able to count on her and being listened. Hervé and Michael for being the best companions of evenings, laughing, drinking and showing me that the distance between Paris and New York and Paris and Montreal is only a message away. Jeanne for her strength and her being simply special. Stefano and Arianna for having being able to give me a piece of Italy even in a Paris sometimes so far from home, that with their love and passion never stop giving me happiness and understanding the difficulties of being uncles at a distance.\\
+
+Detto ciò, mi sento in dovere di cambiare lingua e concludere in italiano per potermi esprimere al meglio.\\
+
+Due anni fa ho lasciato la mia Padova provando un turbinio di emozioni. Ero felice, emozionato, un po' spaventato ma anche lievemente preoccupato. Durante gli anni della mia Triennale ho avuto l'opportunità di conoscere tante persone che hanno arricchito la mia vita in moltissimi modi differenti e ciascuna di esse mi ha portato ad essere la persona che oggi sono. Con alcune di queste persone il viaggio si è interrotto ma vorrei comunque augurare loro il meglio per aver condiviso con me parte di questo percorso. Con molti altri (i più sfortunati ahahah) la relazione è continuata e la sorpresa più bella è stato lo scoprire che ogni volta che ci vedevamo il tempo sembrava non essere mai passato.\\
+
+Tra queste amicizie per me speciali vorrei in particolar modo rigraziare le Anne della mio anno da strapazzo, che mi sono portato a Parigi come supporto personale e hanno sopportato più di chiunque altro le fatiche che mi hanno portato sin qui. Anna Negro per aver creduto in me più di chiunque altro, anche quando la mia tenacia comiciava a vacillare, per essersi mostrata all'altezza di ogni situazione e avermi dato la forza di cui avevo bisogno. Anna Florio, per essere stato il mio tutor preferito, per avermi insegnato ad inseguire le proprie passioni, per avermi fatto da mentore, amica, mamma, sostenitrice in ogni singolo istante e per ricordarmi di tenere la schiena dritta quando la situazione diventa complicata.\\
+
+Seguendo con la schiera di sostenitrici e amiche, voglio ringraziare di cuore Elisabetta, Chiara e Giorgia, che con la loro umanità, comprensione, amore e felicità mi hanno insegnato a vivere "come se vedessi solo il sole". Grazie per avermi mostrato che la distanza è solo un vincolo fisico ma che, in fin dei conti, conta poco, per le emozioni provate ad ogni rincontro come ai vecchi tempi e per farmi capire che cosa voglia dire essere tornato a casa. Alessandra e Greta per la loro amicizia e tutti i momenti passati assieme.\\
+
+Vorrei invece ringraziare Alexander per la sua resilienza e la forza di cui stimo e di cui non potrei essere più fiero, ringraziarlo perché ogni incomprensione sembra svanire con uno sguardo e per riuscire a ricordarmi dopo le mie fatiche la passione che mi ha spinto a lasciare tutto e partire verso questa folle avventura.\\
+
+I would like to thank Andrea, for her incredible wisdom, for having taught me to be a better person, a prouder one, a more professional one, a kinder one, a truer one, aware of his abilities. Thank you specially for having given me the example that whatever happens in life, when you have the strength to believe in yourself and can find the positive from every situation everything is possible.\\
+
+Vorrei anche ringraziare le persone che mi stanno vicine da un po' più tempo degli altri. Chiara e Rebecca specialmente per il loro buon umore, la loro grinta e per avermi insegnato a non prendermi troppo sul serio. Betti per essere l'amica storica migliore che si possa sperare avere, per essere sempre stata lì per me, per la sua dolcezza, tenerezza, bontà e amore, ma anche per il suo punto di vista oggettivo e le sue parole di conforto, sempre appropriate. Silvia per avermi insegnato a vivere a colori e per darmi tutta la dolcezza di cui una persona possa avere bisogno.\\
+
+Infine vorrei ringraziare chi davvero mi ha permesso di essere qui ed è il mio orgoglio personale, a scapito di sembrare l'italiano cliché particolarmente attaccato alla sua famiglia. I miei genitori in particolar modo che mi hanno mostrato come reinventarsi possa essere possibile a qualsiasi età, che inseguire i propri sogni è sempre una possibilità percorribile e che non conta da dove si viene ma lavorando sodo si possono conquistare grandi risultati. Mio papà per la sua perseveranza e umiltà. La mia mamma per la forza che mi ha sempre dimostrato, specialmente nel periodo della chemio, per l'amore sconfinato di cui mi ha fatto traboccare il cuore, per avermi insegnato ad essere una persona bella nello spirito più che nelle apparenze.\\
+
+L'ultima persona che devo ringraziare è l'amore della mia vita\footnote{Fino al 30 Maggio 2020 dove questa persona ha partorito il focus delle mie attenzioni attuali, Camilla Baroffi.}, l'unica persona che riesce a tenermi testa all 100\%, colei la distanza dalla quale mi fa mancare il fiato ma che c'è sempre in ogni momento, nonostante la nostra posizione nel mondo, Marta. Un enorme grazie va a lei, per non avere paura di dirmi la verità, "per tutti singoli momenti nostri, i nostri gesti più nascosti", per essere l'unica persona che nonostante le 300 mila volte in cui abbiamo ripetuto la stessa scena continua a farmi emozionare al punto di piangere ogni volta che la vedo e ogni volta che parto, per essere là nei momenti di gioia e darmi man forte in quelli più difficili.\\
+
+Grazie.
+
+\newpage
+\section{Bibliography}
+% \nocite{*} %to print all the bibliography, even the one not cited
+% \bibliography{literature} 
+% \bibliographystyle{amsalpha}
+
+$\quad$ Basu, S. 1977. “Investment Performance of Common Stocks in Relation to Their Price-Earnings Ratios: A Test of the Efficient Market Hypothesis.” \textit{Journal of Finance} 32 (3): 663-682.\\
+
+$\quad$ Ben Dor, A., L. Dynkin, J. Hyman, P. Houweling, E. van Leeuwen, and O. Penninga. 2007. “DTSSM (Duration Times Spread).” \textit{The Journal of Portfolio Management} 33 (2): 77-100.\\
+
+$\quad$ Fama, E. F., and R. F. Kenneth. 1993. “Common Risk Factors in the Returns on Stocks and Bonds,” \textit{Journal of Financial Economics} 33 (1): 3–56.\\
+
+$\quad$ Harvey, C. R., L. Yan, and H. Zhu. 2016. “… and the Cross-Section of Expected Returns.” \textit{The Review of Financial Studies} 29 (1): 5-68.\\
+
+$\quad$ Haugen, R.A., and A.J. Heins. 1972. “On the Evidence Supporting the Existence of Risk Premiums in the Capital Markets.” Working Paper,
+
+\underbar{http://ssrn.com/abstract=1783797}. \\
+
+$\quad$ Hou, K., C. Xue, and L. Zhang. 2017. “Replicating Anomalies.” NBER Working Papers 23394, National Bureau of Economic Research, Inc.,
+
+\underbar{http://www.nber.org/2018LTAM/hou.pdf}.\\
+
+$\quad$ Houweling, P., and J. van Zundert. 2017. “Factor Investing in the Corporate Bond Market.” \textit{Financial Analysts Journal} 73 (2): 100-115.\\
+
+$\quad$ Israel, R., D. Palhares, and S. Richardson. 2018. “Common Factors in Corporate Bond Returns.” \textit{Journal of Investment Management} 16 (2): 17-46.\\
+
+$\quad$ Jagadeesh, N., and S. Titman. 1993. “Returns to Buying Winners and Selling Losers: Implications for Stock Market Efficiency.” \textit{Journal of Finance} 48 (1): 65-91.\\
+
+$\quad$ Duan, J.-C., and T. Wang. 2012. “Measuring Distance-to-Default for Financial and Non-Financial Firms.” \textit{Global Credit Review} 2: 95-108.\\
+
+$\quad$ Lee, T., and C. Wang. 2018. “Why trade over-the-counter? When investors want price Discrimination.” Working paper,
+
+\underbar{https://papers.ssrn.com/sol3/papers.cfm?abstract\_id=3087647}.\\
+
+$\quad$ Leote de Carvalho, R. L., P. Dugnolle, X. Lu, and P. Moulin. 2014. “Low-Risk Anomalies in Global Fixed Income: Evidence from Major Broad Markets.” \textit{The Journal of Fixed Income} 23 (4): 51-70. \\
+
+$\quad$ Leote de Carvalho, R. L., X. Lu, F. Soupe, and P. Dugnolle. 2017. “Diversify and Purify Factor Premiums in Equity Markets.” In \textit{Factor Investing, From Traditional to Alternative Risk Premia}, edited by E. Jurczenko, 73-97. ISTE Press Ltd.: Elsevier Ltd. \\
+
+$\quad$ Pilotte, E.A., and F.P. Sterbenz. 2006. “Sharpe and Treynor Ratios on Treasury Bonds.” \textit{The Journal of Business} 79 (1): 149-180.
+
+\end{document}
